@@ -6,14 +6,13 @@
 
 			var words = Observable();
 
-			var word = Observable();
-			word = "Test";
+			var word = Observable("Test");
 
 			searchClicked();
 
 			function searchClicked() {
 				words.clear();
-				fetch('http://api.urbandictionary.com/v0/define?term=' + word)
+				fetch('http://api.urbandictionary.com/v0/define?term=' + word.value)
 				.then(function(result) {
 					result.json().then(function(data) {
 						data.list.map(function(word, index) {
@@ -25,11 +24,11 @@
 			}
 
 			function clearSearch() {
-				word = "";
+				word = Observable("");
 			}
 
 			var input = function(text) {
-				word = text.value;
+				word = text;
 		 	}
 
 			module.exports = {
