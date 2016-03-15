@@ -1,0 +1,106 @@
+<App Theme="Basic">
+	<DockPanel>
+		<iOS.StatusBarConfig ux:Name="statusBarConfig" Style="Light" IsVisible="true"/>
+		<JavaScript>
+			var Observable = require('FuseJS/Observable');
+
+			var words = Observable();
+
+			var word = Observable();
+			word = "Test";
+
+			searchClicked();
+
+			function searchClicked() {
+				words.clear();
+				fetch('http://api.urbandictionary.com/v0/define?term=' + word)
+				.then(function(result) {
+					result.json().then(function(data) {
+						data.list.map(function(word, index) {
+							word.index = "#" + ++index;
+							words.add(word);
+						})
+					})
+				})
+			}
+
+			function clearSearch() {
+				word = "";
+			}
+
+			var input = function(text) {
+				word = text.value;
+		 	}
+
+			module.exports = {
+				words: words,
+				word: word,
+				searchClicked: searchClicked,
+				input: input,
+				clearSearch: clearSearch
+			}
+
+		</JavaScript>
+
+		<DockPanel>
+			<StackPanel Dock="Top" Orientation="Horizontal" Height="150" Width="100%" ux:Name="top" Background="#fff">
+				<Panel Alignment="Left" Width="200" ux:Name="searchValue">
+					<TextInput Value="{word}" Clicked="{clearSearch}" FontSize="24" Width="100%" Padding="0,0,0,5" ValueChanged="{input}" Alignment="CenterLeft" Margin="20,0,0,0"  ux:Name="searchInput"/>
+				</Panel>
+				<Panel Alignment="Right" Width="200" ux:Name="logo">
+					<Clicked>
+						<Callback Handler="{searchClicked}" />
+						<Change scrollView.Y="0" />
+					</Clicked>
+					<Image File="Assets/ugly-logo.png" Height="50" Width="50">
+						<Rotation ux:Name="logoRotation" />
+					</Image>
+					<Translation ux:Name="logoMoving" />
+					<Scaling ux:Name="logoScaling" />
+				</Panel>
+			</StackPanel>
+			<StackPanel>
+				<Rectangle ux:Name="selection">
+					<Stroke Width="12" Brush="#FD5157" Offset="10" ux:Name="topStroke" />
+				</Rectangle>
+			</StackPanel>
+			<ScrollView Padding="30,0,30,0" ux:Name="scrollView">
+				<ScrollingAnimation From="0" To="200">
+					 <Change top.Height="60" />
+					 <Change searchInput.FontSize="16" />
+					 <Change topStroke.Offset="2" />
+					 <Change topStroke.Brush="#000" />
+					 <Change logoRotation.Degrees="900"/>
+					 <Change logoScaling.Factor="0.6"/>
+					 <Change logoMoving.X="30"/>
+				 </ScrollingAnimation>
+				<StackPanel>
+					<Each Items="{words}">
+						<StackPanel Margin="0,40,0,0" Background="#fff" Padding="20">
+							<Text Value="{index}" FontSize="18" Alignment="Left" />
+							<Text Value="Definition" FontSize="12" Alignment="Right" />
+							<Rectangle ux:Name="selection" Margin="0,0,0,10">
+								<Stroke Width="4" Brush="#FD5157" Offset="1" />
+							</Rectangle>
+							<Text Value="{definition}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,30"/>
+							<Text Value="Example" FontSize="12" Alignment="Right" />
+							<Rectangle ux:Name="selection" Margin="0,0,0,10">
+								<Stroke Width="4" Brush="#FD5157" Offset="1" />
+							</Rectangle>
+							<Text Value="{example}" FontSize="12" TextWrapping="Wrap" />
+							<DockPanel Margin="0,20,0,0">
+								<StackPanel Orientation="Horizontal" Alignment="Left">
+									<Text Value="{thumbs_up}" FontSize="14" TextColor="#A3D372" Alignment="Left"/>
+									<Text Value="{thumbs_down}" FontSize="12" TextColor="#FD5157" Alignment="BottomLeft" />
+								</StackPanel>
+								<Text Value="{author}" FontSize="12" Alignment="Right" />
+							</DockPanel>
+						</StackPanel>
+					</Each>
+					<Image ux:Class="BackgroundImage" StretchMode="UniformToFill" />
+				</StackPanel>
+			</ScrollView>
+		</DockPanel>
+		<BackgroundImage File="Assets/background.png" />
+	</DockPanel>
+</App>
